@@ -31,8 +31,11 @@ if releases:
     stats["last_update"] = releases[0].get("published_at")
     stats["created"] = releases[-1].get("published_at")  # el más viejo
 
-with open("stats.json", "w", encoding="utf-8") as f:
-    json.dump(stats, f, indent=4)
+import os
 
+os.makedirs("data", exist_ok=True)  # crea la carpeta si no existe
+
+with open(os.path.join("data", "stats.json"), "w", encoding="utf-8") as f:
+    json.dump(stats, f, indent=4)
 
 print("Estadisticas actulizadas")
