@@ -2,8 +2,8 @@ name: Update Stats
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # cada 15 minutos
-  workflow_dispatch:          # se puede lanzar manualmente
+    - cron: "0 * * * *"   # cada hora en el minuto 0
+  workflow_dispatch:        # se puede lanzar manualmente
 
 jobs:
   update-stats:
