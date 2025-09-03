@@ -32,6 +32,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/stats.json
-          git commit -m "chore: auto update stats" || echo "No changes to commit"
+          git add stats.json
+          git commit -m "chore: add stats.json to repo"
           git push
+
