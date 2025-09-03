@@ -6,8 +6,10 @@ on:
   workflow_dispatch:        # se puede lanzar manualmente
 
 jobs:
-  update-stats:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write 
 
     steps:
       - name: Checkout repo
