@@ -42,7 +42,7 @@ jobs:
         with:
           repository: samp-comunity/plujin-manager
           path: plujin-manager
-          token: ${{ secrets.PERSONAL_TOKEN }} # necesitas un PAT con permisos de escritura
+          token: ${{ secrets.PLUGIN_MANAGER_TOKEN }} # necesitas un PAT con permisos de escritura
 
       # 3. Ejecutar el script que mete stats en scripts.json
       - name: Update scripts.json in Plujin Manager
