@@ -50,7 +50,6 @@ jobs:
           token: ${{ secrets.PLUGIN_MANAGER_TOKEN }}
 
       - name: Sync stats to Plujin Manager
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.sync_plujin == 'true' }}
         run: |
           cd gamefixer
           python scripts/update_gamefixer.py
