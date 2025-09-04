@@ -45,13 +45,13 @@ jobs:
           token: ${{ secrets.PLUGIN_MANAGER_TOKEN }} # necesitas un PAT con permisos de escritura
 
       # 3. Ejecutar el script que mete stats en scripts.json
-      - name: Update scripts.json in Plujin Manager
+      - name: Update stats.json
         run: |
           cd gamefixer
-          python scripts/update_gamefixer.py
-          cd ../plujin-manager
+          python scripts/update_stats.py
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/scripts.json
-          git commit -m "chore: sync GameFixer stats" || echo "No changes to commit"
-          git push
+          git add data/stats.json
+          git commit -m "chore: auto update stats" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin main
