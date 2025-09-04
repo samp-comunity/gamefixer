@@ -1,43 +1,48 @@
-name: Update Stats
+import json
 
-on:
-  schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+# Rutas relativas desde gamefixer/
+stats_path = "data/stats.json"                      # stats.json está dentro de gamefixer
+scripts_path = "../plujin-manager/assets/scripts.json"  # scripts.json está en el otro repo
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+# Cargar stats.json
+with open(stats_path, "r", encoding="utf-8") as f:
+    stats = json.load(f)
 
-    steps:
-      - name: Checkout gamefixer repo
-        uses: actions/checkout@v3
+# Cargar scripts.json
+with open(scripts_path, "r", encoding="utf-8") as f:
+    scripts = json.load(f)
 
-      - name: Checkout plujin-manager repo
-        uses: actions/checkout@v3
-        with:
-          repository: samp-comunity/plujin-manager
-          path: plujin-manager
-          token: ${{ secrets.PLUGIN_MANAGER_TOKEN }}
+# Buscar entrada de GameFixer.lua
+gamefixer = None
+for mod in scripts.get("mods", []):
+    if mod.get("name") == "GameFixer.lua":
+        gamefixer = mod
+        break
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
+if gamefixer:
+    # Actualizar campos
+    gamefixer["total_downloads"] = stats.get("total_downloads")
+    gamefixer["created"] = stats.get("created")
+    gamefixer["last_update"] = stats.get("last_update")
+    gamefixer["latest_version"] = stats.get("latest_version")
+else:
+    # Si no existe, agregarlo como nuevo
+    scripts["mods"].append({
+        "name": "GameFixer.lua",
+        "description": "",
+        "author": "vxnzz",
+        "downloads": 0,
+        "url": "https://github.com/samp-comunity/gamefixer/releases/latest/download/GameFixer.lua",
+        "icon": "https://raw.githubusercontent.com/samp-comunity/plujin-manager/refs/heads/master/assets/icons/gamefixer.png",
+        "tags": ["Legal", "Utilidad"],
+        "total_downloads": stats.get("total_downloads"),
+        "created": stats.get("created"),
+        "last_update": stats.get("last_update"),
+        "latest_version": stats.get("latest_version"),
+    })
 
-      - name: Install dependencies
-        run: pip install requests
+# Guardar de nuevo en plujin-manager
+with open(scripts_path, "w", encoding="utf-8") as f:
+    json.dump(scripts, f, indent=2, ensure_ascii=False)
 
-      - name: Run update script
-        run: python scripts/update_gamefixer.py
-
-      - name: Commit and push changes
-        run: |
-          cd plujin-manager
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/scripts.json
-          git commit -m "chore: auto update GameFixer stats" || echo "No changes to commit"
-          git push
+print("✅ scripts.json actualizado con datos de GameFixer")
