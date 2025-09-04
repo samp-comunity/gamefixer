@@ -1,0 +1,57 @@
+name: Update Stats and Sync to Plujin Manager
+
+on:
+  schedule:
+    - cron: '0 * * * *' # cada hora en el minuto 0
+  workflow_dispatch: # se puede lanzar manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout GameFixer
+        uses: actions/checkout@v3
+        with:
+          path: gamefixer
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      # 1. Actualizar stats.json en GameFixer
+      - name: Update stats.json
+        run: |
+          cd gamefixer
+          python scripts/update_stats.py
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/stats.json
+          git commit -m "chore: auto update stats" || echo "No changes to commit"
+          git push
+
+      # 2. Clonar plujin-manager
+      - name: Checkout Plujin Manager
+        uses: actions/checkout@v3
+        with:
+          repository: samp-comunity/plujin-manager
+          path: plujin-manager
+          token: ${{ secrets.PERSONAL_TOKEN }} # necesitas un PAT con permisos de escritura
+
+      # 3. Ejecutar el script que mete stats en scripts.json
+      - name: Update scripts.json in Plujin Manager
+        run: |
+          cd gamefixer
+          python scripts/update_gamefixer.py
+          cd ../plujin-manager
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/scripts.json
+          git commit -m "chore: sync GameFixer stats" || echo "No changes to commit"
+          git push
