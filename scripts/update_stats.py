@@ -1,4 +1,6 @@
 import requests, json
+from datetime import datetime
+import os
 
 url = "https://api.github.com/repos/samp-comunity/gamefixer/releases"
 r = requests.get(url)
@@ -13,6 +15,12 @@ stats = {
     "versions": []
 }
 
+def format_date(date_str):
+    if not date_str:
+        return None
+    dt = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+    return dt.strftime("%b %d %Y").upper()
+
 for rel in releases:
     tag = rel.get("tag_name")
     downloads = sum(asset["download_count"] for asset in rel.get("assets", []))
@@ -22,20 +30,18 @@ for rel in releases:
     stats["versions"].append({
         "tag": tag,
         "downloads": downloads,
-        "date": published_at
+        "date": format_date(published_at)
     })
 
 # releases viene ordenado (nuevo primero)
 if releases:
     stats["latest_version"] = releases[0].get("tag_name")
-    stats["last_update"] = releases[0].get("published_at")
-    stats["created"] = releases[-1].get("published_at")  # el más viejo
-
-import os
+    stats["last_update"] = format_date(releases[0].get("published_at"))
+    stats["created"] = format_date(releases[-1].get("published_at"))  # el más viejo
 
 os.makedirs("data", exist_ok=True)  # crea la carpeta si no existe
 
 with open(os.path.join("data", "stats.json"), "w", encoding="utf-8") as f:
     json.dump(stats, f, indent=4)
 
-print("Estadisticas actulizadas")
+print("Estadísticas actualizadas")
