@@ -1,6 +1,6 @@
 {
     "name": "gamefixer",
-    "total_downloads": 47,
+    "total_downloads": 52,
     "created": "SEP 02 2025",
     "last_update": "SEP 03 2025",
     "latest_version": "v1.0.1",
@@ -12,7 +12,7 @@
         },
         {
             "tag": "v1.0.0",
-            "downloads": 42,
+            "downloads": 47,
             "date": "SEP 02 2025"
         }
     ]
